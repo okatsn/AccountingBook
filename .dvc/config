@@ -1,0 +1,4 @@
+[core]
+    remote = twopigs
+['remote "twopigs"']
+    url = gdrive://1RjJoF3u9hD1HhpvK4Oy_CCa507yxXBYU
