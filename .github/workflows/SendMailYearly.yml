@@ -1,0 +1,25 @@
+# You have to set PAT and add secrete ACCESS_OKREGISTRY in the repo {{{PKG}}}
+# https://stevenmortimer.com/running-github-actions-sequentially/
+# see also the default template: https://github.com/JuliaCI/PkgTemplates.jl/blob/master/templates/github/workflows/register.yml
+
+name: SendMailYearly
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * 1" # Run every Tuesday at midnight UTC
+
+jobs:
+  send:
+    name: Documentation
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+      - uses: julia-actions/setup-julia@v1
+        with:
+          version: "1"
+      - uses: okatsn/add-registry@v1
+      - uses: julia-actions/julia-buildpkg@v1
+      - run: |
+          julia --project=@. -e 'include("scripts/weekly_summary.jl")' "${{ secrets.GMAIL_APP_ADDRESS }}" "${{ secrets.GMAIL_APP_KEY }}" "${{ secrets.GSHEET_KEY }}" "Yearly"

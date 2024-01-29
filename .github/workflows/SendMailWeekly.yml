@@ -6,7 +6,7 @@ name: SendMailWeekly
 on:
     workflow_dispatch:
     schedule:
-        - cron: "0 0 * * 2" # Run every Tuesday at midnight UTC
+        - cron: "0 0 * * 1" # Run every Tuesday at midnight UTC
 
 jobs:
     send:
@@ -22,4 +22,4 @@ jobs:
             - uses: okatsn/add-registry@v1
             - uses: julia-actions/julia-buildpkg@v1
             - run: |
-                  julia --project=@. -e 'include("scripts/weekly_summary.jl")' "${{ secrets.GMAIL_APP_ADDRESS }}" "${{ secrets.GMAIL_APP_KEY }}" "${{ secrets.GSHEET_KEY }}"
+                  julia --project=@. -e 'include("scripts/weekly_summary.jl")' "${{ secrets.GMAIL_APP_ADDRESS }}" "${{ secrets.GMAIL_APP_KEY }}" "${{ secrets.GSHEET_KEY }}" "Weekly"

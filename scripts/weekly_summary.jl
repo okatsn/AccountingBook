@@ -9,6 +9,11 @@ using Test
 using SMTPClient
 using Dates
 
+arg4 = Dict(
+    "Weekly" => Arg4(subject="兩豬家記帳本週摘要", interval=Dates.Week),
+    "Yearly" => Arg4(subject="兩豬家記帳本年摘要", interval=Dates.Year),
+)[ARGS[4]]
+
 sheetid = ARGS[3]
 sender = ARGS[1]
 
@@ -17,7 +22,7 @@ df0 = readgsheet(url)
 
 
 t1 = now() + Hour(8) # we are at UTC+8
-t0 = t1 - Week(1)
+t0 = t1 - arg4.interval(1)
 
 df = @chain df0 begin
     select("時間戳記" => ByRow(convertdatetime) => :time,
@@ -30,19 +35,25 @@ df = @chain df0 begin
 end
 
 summary = @chain df begin
-    transform(:inout => ByRow(numinout); renamecols=false)
-    select(Not([:inout, :amount]), [:inout, :amount] => ByRow((s, v) -> s * v) => :flows)
+    select(Not([:inout, :amount]), [:inout, :amount] => ByRow((s, v) -> numinout(s) * v) => :flows)
     groupby(:whosaccount)
     combine(:flows => sum => :netflow)
-    select(:whosaccount => ByRow(s -> getmatch(r"[\u4e00-\u9fff]+", s)) => "Account", :netflow => "Net Flow")
+    select(:whosaccount => ByRow(getaccountname) => "Account", :netflow => "Net Flow")
 end
 
-htmlsummary = render_table(summary)
 
-htmltb = @chain df begin
+dfthis = @chain df begin
     filter(:time => (dt -> t1 > dt ≥ t0), _)
-    render_table
+    transform(:memo => ByRow(x -> ifelse(ismissing(x), "", x)), [:inout, :amount] => ByRow((s, v) -> numinout(s) * v) => :difference; renamecols=false)
+    select(Not(:inout, :amount))
+    transform(:whosaccount => ByRow(getaccountname); renamecols=false)
 end
+
+dfthis_sum = @chain dfthis begin
+    groupby(:whosaccount)
+    combine(:difference => sum => "Net Difference")
+end
+
 
 recipients = unique(df0[!, "電子郵件地址"])
 # uniquewhos = unique(df[!, :whosaccount])
@@ -66,19 +77,21 @@ opt = SendOptions(
 
 url = "smtps://smtp.gmail.com:465"
 
-subject = "兩豬家記帳本週摘要"
+subject = arg4.subject
 from = "<$sender>"
 
 msg0 = @htl("""
 <p><strong>$subject</strong>：<br>
 
-Weekly summary:
+<p>$(render_table(dfthis))</p>
 
-<p>$htmltb</p>
+Summary of this $(arg4.interval):
+
+<p>$(render_table(dfthis_sum))</p>
 
 Overall Summary:
 
-<p>$htmlsummary</p>
+<p>$(render_table(summary))</p>
 
 </p>
 

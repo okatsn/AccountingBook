@@ -13,6 +13,8 @@ using HypertextLiteral
 include("rendertable.jl")
 export render_table
 
+using Dates
 include("others.jl")
-export numinout, getmatch
+export numinout, getmatch, getaccountname
+export Arg4
 end
