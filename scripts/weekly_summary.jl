@@ -5,6 +5,14 @@ using Chain
 using PrettyTables
 using HypertextLiteral
 using Markdown
-using Suppressor
 using Test
 using SMTPClient
+
+sheetid = ARGS[3]
+
+# cloudtable = @suppress readgsheet("https://docs.google.com/spreadsheets/d/$sheetid/edit?usp=sharing")
+
+
+
+url = "https://docs.google.com/spreadsheets/d/$sheetid/edit?usp=sharing"
+df0 = readgsheet(url)
