@@ -5,9 +5,6 @@
 name: SendMailWeekly
 on:
     workflow_dispatch:
-    push:
-        branches:
-            - main
     schedule:
         - cron: "0 0 * * 2" # Run every Tuesday at midnight UTC
 
