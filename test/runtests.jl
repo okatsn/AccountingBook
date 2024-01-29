@@ -19,7 +19,7 @@ end
 
 (testfiles, allnames) = targetlist(r"^(?!runtests).*(\.jl)$", "./");
 # pwd() here should be "./test/"
-@testset "AccountingBook.jl" begin
+@testset "AccountingBook" begin
     for f in testfiles
         # write test in the file of the same name.
         # E.g., `test/mycode.jl` for testing `src/mycode.jl`.
@@ -34,7 +34,7 @@ using Documenter
     # See also https://documenter.juliadocs.org/stable/man/doctests/#Setup-Code
 
 
-    doctest(AccountingBook; manual = false) # this makes jldoctest also be tested in a local test
+    doctest(AccountingBook; manual=false) # this makes jldoctest also be tested in a local test
 end
 
 using CompatHelperLocal

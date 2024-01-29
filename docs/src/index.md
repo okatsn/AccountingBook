@@ -4,7 +4,7 @@ CurrentModule = AccountingBook
 
 # AccountingBook
 
-Documentation for [AccountingBook](https://github.com/okatsn/AccountingBook.jl).
+Documentation for [AccountingBook](https://github.com/okatsn/AccountingBook).
 
 ```@index
 ```

@@ -12,11 +12,11 @@ DocMeta.setdocmeta!(AccountingBook, :DocTestSetup, :(using AccountingBook); recu
 makedocs(;
     modules=[AccountingBook],
     authors="okatsn <okatsn@gmail.com> and contributors",
-    repo="https://github.com/okatsn/AccountingBook.jl/blob/{commit}{path}#{line}",
-    sitename="AccountingBook.jl",
+    repo="https://github.com/okatsn/AccountingBook/blob/{commit}{path}#{line}",
+    sitename="AccountingBook",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://okatsn.github.io/AccountingBook.jl",
+        canonical="https://okatsn.github.io/AccountingBook",
         edit_link="main",
         assets=String[],
     ),
@@ -29,6 +29,6 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/okatsn/AccountingBook.jl",
+    repo="github.com/okatsn/AccountingBook",
     devbranch="main",
 )
