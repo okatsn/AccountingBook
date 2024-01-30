@@ -6,8 +6,11 @@ name: SendMailWeekly
 on:
     workflow_dispatch:
     schedule:
-        - cron: "0 0 * * 1" # Run every Tuesday at midnight UTC
-
+        - cron: "0 16 * * 1" # Run every Tuesday at midnight UTC
+        # The first 0 represents the minute (0 to 59).
+        # The second represents the hour (0 to 23).
+        # The * in the third and fourth positions represents any day of the month and any month.
+        # The 1 in the fifth position represents Monday.
 jobs:
     send:
         name: Documentation
