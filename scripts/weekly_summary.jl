@@ -38,20 +38,20 @@ summary = @chain df begin
     select(Not([:inout, :amount]), [:inout, :amount] => ByRow((s, v) -> numinout(s) * v) => :flows)
     groupby(:whosaccount)
     combine(:flows => sum => :netflow)
-    select(:whosaccount => ByRow(getaccountname) => "Account", :netflow => "Net Flow")
+    select(:whosaccount => ByRow(getaccountname), :netflow; renamecols=false)
 end
 
 
 dfthis = @chain df begin
     filter(:time => (dt -> t1 > dt ≥ t0), _)
-    transform(:memo => ByRow(x -> ifelse(ismissing(x), "", x)), [:inout, :amount] => ByRow((s, v) -> numinout(s) * v) => :difference; renamecols=false)
+    transform(:memo => ByRow(x -> ifelse(ismissing(x), "", x)), [:inout, :amount] => ByRow((s, v) -> numinout(s) * v) => :flows; renamecols=false)
     select(Not(:inout, :amount))
     transform(:whosaccount => ByRow(getaccountname); renamecols=false)
 end
 
 dfthis_sum = @chain dfthis begin
     groupby(:whosaccount)
-    combine(:difference => sum => "Net Difference")
+    combine(:flows => sum => :netflow)
 end
 
 
@@ -65,7 +65,14 @@ recipients = unique(df0[!, "電子郵件地址"])
 # convertfromAB(str) = Dict(getmatch.(r"[AB]", uniquewhos) .=> getmatch.(r"[\u4e00-\u9fff]+", uniquewhos))[str]
 
 
-
+function render_table2(df)
+    d = Dict(:whosaccount => "帳戶", :item => "品項", :memo => "備註", :flows => "入/出", :netflow => "淨入/出")
+    renamer(col) = get(d, Symbol(col), col) # rename seems to convert a column name (`col`) to string before sending it to the function (i.e., renamer)
+    @chain df begin
+        rename(renamer, _)
+        render_table
+    end
+end
 
 
 # Send Email
@@ -81,20 +88,50 @@ subject = arg4.subject
 from = "<$sender>"
 
 msg0 = @htl("""
-<p><strong>$subject</strong>：<br>
+<html>
 
-<p>$(render_table(dfthis))</p>
+    <head>
+        <style>
+        h1 {
+            font-size: 24px;
+            font-weight: bold;
+        }
 
-Summary of this $(arg4.interval):
+        h2 {
+            font-size: 18px;
+            font-weight: bold;
+        }
 
-<p>$(render_table(dfthis_sum))</p>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
 
-Overall Summary:
+        table, th, td {
+            border: 1px solid black;
+        }
+        </style>
+    </head>
 
-<p>$(render_table(summary))</p>
+    <body>
 
-</p>
+        <p>
+            <p><h1>$subject</h1></p>
 
+            <p>$(render_table2(select(dfthis, Not(:email))))</p>
+
+            <p><h2>Summary of this $(arg4.interval):</h2></p>
+
+            <p>$(render_table2(dfthis_sum))</p>
+
+            <p><h2>Overall Summary:</h2></p>
+
+            <p>$(render_table2(summary))</p>
+
+        </p>
+
+    </body>
+</html>
 """)
 
 for r in recipients
