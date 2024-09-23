@@ -1,0 +1,6 @@
+{
+    "devcontainer_name": "AccountingBooks",
+    "service": "devab",
+    "image": "abooks",
+    "docker_compose_name": "jupyter-abooks"
+}
