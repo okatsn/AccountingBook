@@ -6,7 +6,6 @@ using PrettyTables
 using HypertextLiteral
 using Markdown
 using Test
-using SMTPClient
 using Dates
 
 sheetid = ARGS[1]
