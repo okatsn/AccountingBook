@@ -9,6 +9,9 @@ using Dates, Chain
 include("convertdatetime.jl")
 export convertdatetime, GoogleFormTimeTagTW
 
+include("preparesheet.jl")
+export preparesheet
+
 using HypertextLiteral
 include("rendertable.jl")
 export render_table

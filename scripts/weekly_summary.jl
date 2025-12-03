@@ -9,13 +9,15 @@ using Test
 using SMTPClient
 using Dates
 
+# Read secrets from environment variables instead of command-line arguments for security
+sender = ENV["GMAIL_APP_ADDRESS"]
+passwd = ENV["GMAIL_APP_KEY"]
+sheetid = ENV["GSHEET_KEY"]
+
 arg4 = Dict(
     "Weekly" => Arg4(subject="兩豬家記帳本週摘要", interval=Dates.Week),
     "Yearly" => Arg4(subject="兩豬家記帳本年摘要", interval=Dates.Year),
-)[ARGS[4]]
-
-sheetid = ARGS[3]
-sender = ARGS[1]
+)[ARGS[1]] # "Yearly" or "Weekly" - now the first argument
 
 url = "https://docs.google.com/spreadsheets/d/$sheetid/edit?usp=sharing"
 df0 = readgsheet(url)
@@ -24,15 +26,7 @@ df0 = readgsheet(url)
 t1 = now() + Hour(8) # we are at UTC+8
 t0 = t1 - arg4.interval(1)
 
-df = @chain df0 begin
-    select("時間戳記" => ByRow(convertdatetime) => :time,
-        "電子郵件地址" => :email,
-        "項目" => :item,
-        "支出或收入" => :inout,
-        "從誰的口袋" => :whosaccount,
-        "金額" => :amount,
-        "備註" => :memo,)
-end
+df = preparesheet(df0)
 
 summary = @chain df begin
     select(Not([:inout, :amount]), [:inout, :amount] => ByRow((s, v) -> numinout(s) * v) => :flows)
@@ -79,7 +73,7 @@ end
 opt = SendOptions(
     isSSL=true,
     username=sender,
-    passwd=ARGS[2],
+    passwd=passwd,
 )
 
 url = "smtps://smtp.gmail.com:465"
