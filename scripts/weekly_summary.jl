@@ -9,13 +9,15 @@ using Test
 using SMTPClient
 using Dates
 
+# Read secrets from environment variables instead of command-line arguments for security
+sender = ENV["GMAIL_APP_ADDRESS"]
+passwd = ENV["GMAIL_APP_KEY"]
+sheetid = ENV["GSHEET_KEY"]
+
 arg4 = Dict(
     "Weekly" => Arg4(subject="兩豬家記帳本週摘要", interval=Dates.Week),
     "Yearly" => Arg4(subject="兩豬家記帳本年摘要", interval=Dates.Year),
-)[ARGS[4]] # "Yearly" or "Weekly"
-
-sheetid = ARGS[3]
-sender = ARGS[1]
+)[ARGS[1]] # "Yearly" or "Weekly" - now the first argument
 
 url = "https://docs.google.com/spreadsheets/d/$sheetid/edit?usp=sharing"
 df0 = readgsheet(url)
@@ -71,7 +73,7 @@ end
 opt = SendOptions(
     isSSL=true,
     username=sender,
-    passwd=ARGS[2],
+    passwd=passwd,
 )
 
 url = "smtps://smtp.gmail.com:465"

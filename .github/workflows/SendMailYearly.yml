@@ -25,5 +25,10 @@ jobs:
           version: "1"
       - uses: okatsn/add-registry@v1
       - uses: julia-actions/julia-buildpkg@v1
-      - run: |
-          julia --project=@. -e 'include("scripts/weekly_summary.jl")' "${{ secrets.GMAIL_APP_ADDRESS }}" "${{ secrets.GMAIL_APP_KEY }}" "${{ secrets.GSHEET_KEY }}" "Yearly"
+      - name: Run Yearly Summary
+        env:
+          GMAIL_APP_ADDRESS: ${{ secrets.GMAIL_APP_ADDRESS }}
+          GMAIL_APP_KEY: ${{ secrets.GMAIL_APP_KEY }}
+          GSHEET_KEY: ${{ secrets.GSHEET_KEY }}
+        run: |
+          julia --project=@. -e 'include("scripts/weekly_summary.jl")' "Yearly"
