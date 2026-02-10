@@ -9,12 +9,19 @@ updates:
   - package-ecosystem: "github-actions"
     # Look for workflow files in the `.github/workflows` directory
     directory: "/"
-    # Check for updates weekly on Monday
+    # Check for updates monthly on the first day of each month
     schedule:
-      interval: "weekly"
-      day: "tuesday"
-      # UTC time
-      time: "02:47"
+      interval: "monthly"
+      # Optional: specify time in UTC (default is randomly assigned)
+      # time: "09:00"
+      # Referring https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference#cronjob
+      # if you need full customization on the schedule.
+      #
+      # # Update Weekly:
+      # interval: "weekly"
+      # day: "monday"
+      # # UTC time
+      # time: "00:00"
     # Set maximum number of open pull requests (default is 5)
     open-pull-requests-limit: 5
     # Customize commit messages and PR titles
