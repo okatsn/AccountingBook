@@ -1,0 +1,27 @@
+# Dependabot configuration to automate GitHub Actions updates
+# This file enables Dependabot to automatically check for updates to GitHub Actions
+# and create pull requests when newer versions are available.
+# Documentation: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    # Look for workflow files in the `.github/workflows` directory
+    directory: "/"
+    # Check for updates weekly on Monday
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      # UTC time
+      time: "02:47"
+    # Set maximum number of open pull requests (default is 5)
+    open-pull-requests-limit: 5
+    # Customize commit messages and PR titles
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    # Add labels to PRs
+    labels:
+      - "dependencies"
+      - "github-actions"
