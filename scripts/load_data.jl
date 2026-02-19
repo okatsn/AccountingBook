@@ -72,19 +72,22 @@ end
 net_cashflow = subset_transfer_cash(net_transfer_by_item)
 
 
-dfthis = @chain df begin
-    filter(:time => (dt -> t1_week > dt ≥ t0_week), _)
+book_svalue(df) = @chain df begin
     calc_svalue
     select(Not(:inout, :amount))
 end
 
-CSV.write(dir_data("expense", "book_thisweek.csv"), dfthis)
+dfthisweek = filter(:time => (dt -> t1_week > dt ≥ t0_week), df) |> book_svalue
 
-dfthis_sum = @chain dfthis begin
+
+
+CSV.write(dir_data("expense", "book_thisweek.csv"), dfthisweek)
+
+dfthisweek_sum = @chain dfthisweek begin
     groupby(:whosaccount)
     combine(:svalue => sum => :netflow)
 end
 
 
 
-CSV.write(dir_data("expense", "summary_thisweek.csv"), dfthis_sum)
+CSV.write(dir_data("expense", "summary_thisweek.csv"), dfthisweek_sum)
