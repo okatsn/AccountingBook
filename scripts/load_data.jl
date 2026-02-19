@@ -1,6 +1,7 @@
 using AccountingBook, DataFrames
 using CSV
 using Chain
+using Dates
 
 # Read secrets from environment variables instead of command-line arguments for security
 const sheetid = ENV["GSHEET_KEY"]
@@ -60,7 +61,7 @@ end
 
 
 dfthis = @chain df begin
-    filter(:time => (dt -> t1 > dt ≥ t0), _)
+    filter(:time => (dt -> t1_week > dt ≥ t0_week), _)
     transform(:memo => ByRow(x -> ifelse(ismissing(x), "", x)), [:inout, :amount] => ByRow((s, v) -> numinout(s) * v) => :flows; renamecols=false)
     select(Not(:inout, :amount))
     transform(:whosaccount => ByRow(getaccountname); renamecols=false)
