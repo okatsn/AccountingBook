@@ -10,6 +10,7 @@ const sheetid2 = ENV["GSHEET2_KEY"] # The key to the book of transferring.
 const this_week = now() |> week
 const this_year = now() |> year
 const default_unit = "NTD"
+const default_memo = ""
 t0_week = floor(now(), Week) + Day(1) + Hour(8) # we are at UTC+8
 t1_week = t0_week + Week(1)
 
@@ -27,6 +28,12 @@ df0a = readgsheet(url2)
 df = preparesheet(df0)
 df2 = preparesheet2(df0a)
 
+for dfi in [df, df2]
+    transform!(dfi,
+        :unit => ByRow(x -> ifelse(ismissing(x), default_unit, x)),
+        :memo => ByRow(x -> ifelse(ismissing(x), default_memo, x))
+        ; renamecols=false)
+end
 
 mkpath(dir_data("transfer"))
 mkpath(dir_data("expense"))
@@ -35,7 +42,6 @@ CSV.write(dir_data("transfer", "book.csv"), df2)
 
 net_expense = @chain df begin
     select(Not([:inout, :amount]), [:inout, :amount] => ByRow((s, v) -> numinout(s) * v) => :svalue)
-    transform(:unit => ByRow(x -> ifelse(ismissing(x), default_unit, x)); renamecols=false)
     groupby([:whosaccount, :unit])
     combine(:svalue => sum => :netflow)
     sort([:whosaccount, :unit])
@@ -63,7 +69,7 @@ end
 
 dfthis = @chain df begin
     filter(:time => (dt -> t1_week > dt ≥ t0_week), _)
-    transform(:memo => ByRow(x -> ifelse(ismissing(x), "", x)), [:inout, :amount] => ByRow((s, v) -> numinout(s) * v) => :svalue; renamecols=false)
+    transform([:inout, :amount] => ByRow((s, v) -> numinout(s) * v) => :svalue; renamecols=false)
     select(Not(:inout, :amount))
     transform(:whosaccount => ByRow(getaccountname); renamecols=false)
 end
