@@ -1,3 +1,6 @@
-FROM okatsn/my-jupyter-with-julia:v2025c
+FROM okatsn/my-jupyter-with-julia:v2026a
+
+USER root
+
 
 USER $NB_USER
