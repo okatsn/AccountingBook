@@ -5,22 +5,16 @@ stages:
     deps:
     - path: scripts/weekly_summary.jl
       hash: md5
-      md5: 6c4c3c2b453a96a968aee65b0f35d88d
-      size: 4431
+      md5: b032a01f5757c4376a284ddeb2c4784a
+      size: 4517
     outs:
-    - path: data/expense_book.csv
+    - path: data/expense
       hash: md5
-      md5: c080f6b28ade0f3e481d1b79c5537f9e
-      size: 100670
-    - path: data/net_expense.csv
+      md5: 0a9238a2a8a02e1e5e58bac8f705caf0.dir
+      size: 100753
+      nfiles: 2
+    - path: data/transfer
       hash: md5
-      md5: b24c0cadd51b8ed794791b82cb3dd81c
-      size: 83
-    - path: data/net_transfer_by_item.csv
-      hash: md5
-      md5: 83502a43bf0df55e9991a0d39f9ad963
-      size: 192
-    - path: data/transfer_book.csv
-      hash: md5
-      md5: 4688faf2b38363cece1d9feb0e2016e7
-      size: 651
+      md5: 4a8b36b784d97050a0f887b730d65767.dir
+      size: 843
+      nfiles: 2
