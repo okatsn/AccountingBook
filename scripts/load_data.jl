@@ -57,3 +57,20 @@ net_cashflow = @chain net_transfer_by_item begin
     groupby([:whosaccount, :unit])
     combine(:svalue => sum => :cashflow)
 end
+
+
+dfthis = @chain df begin
+    filter(:time => (dt -> t1 > dt ≥ t0), _)
+    transform(:memo => ByRow(x -> ifelse(ismissing(x), "", x)), [:inout, :amount] => ByRow((s, v) -> numinout(s) * v) => :flows; renamecols=false)
+    select(Not(:inout, :amount))
+    transform(:whosaccount => ByRow(getaccountname); renamecols=false)
+end
+
+CSV.write(dir_data("transfer", "book_thisweek.csv"), dfthis)
+
+dfthis_sum = @chain dfthis begin
+    groupby(:whosaccount)
+    combine(:flows => sum => :netflow_expense)
+end
+
+CSV.write(dir_data("transfer", "summary_thisweek.csv"), dfthis_sum)

@@ -25,19 +25,11 @@ net_expense = CSV.read(dir_data("expense", "summary_overall.csv"), DataFrame)
 net_transfer_by_item = CSV.read(dir_data("transfer", "summary_by_item.csv"), DataFrame)
 
 
+dfthis = CSV.read(dir_data("transfer", "book_thisweek.csv"), DataFrame)
+dfthis_sum = CSV.read(dir_data("transfer", "summary_thisweek.csv"), DataFrame)
 
 
-dfthis = @chain df begin
-    filter(:time => (dt -> t1 > dt ≥ t0), _)
-    transform(:memo => ByRow(x -> ifelse(ismissing(x), "", x)), [:inout, :amount] => ByRow((s, v) -> numinout(s) * v) => :flows; renamecols=false)
-    select(Not(:inout, :amount))
-    transform(:whosaccount => ByRow(getaccountname); renamecols=false)
-end
 
-dfthis_sum = @chain dfthis begin
-    groupby(:whosaccount)
-    combine(:flows => sum => :netflow_expense)
-end
 
 
 recipients = unique(vcat(df.email, df2.email))
