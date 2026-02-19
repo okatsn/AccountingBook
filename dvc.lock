@@ -5,7 +5,7 @@ stages:
     deps:
     - path: data/expense
       hash: md5
-      md5: dac1669f4123a092de0d03ebf7668e19.dir
+      md5: d1e0f56a01bbbbd1d3b2ef0be5f3c1f6.dir
       size: 105377
       nfiles: 4
     - path: data/transfer
@@ -22,12 +22,12 @@ stages:
     deps:
     - path: scripts/load_data.jl
       hash: md5
-      md5: 8b614597ebef4f7c75598e4a050a7422
-      size: 2660
+      md5: c63dec86b267caa5ea12b3a184f17be9
+      size: 2589
     outs:
     - path: data/expense
       hash: md5
-      md5: dac1669f4123a092de0d03ebf7668e19.dir
+      md5: d1e0f56a01bbbbd1d3b2ef0be5f3c1f6.dir
       size: 105377
       nfiles: 4
     - path: data/transfer
