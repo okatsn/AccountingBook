@@ -7,12 +7,15 @@
     "chat.agentFilesLocations": {
         "../.github/agents": true,
         "../my-agents/general/agents": true,
+        "../my-agents/julia/agents": true,
     },
     "chat.promptFilesLocations": {
         "../my-agents/general/prompts": true,
+        "../my-agents/julia/prompts": true,
     },
     "chat.instructionsFilesLocations": {
         "../my-agents/shell/instructions": true,
+        "../my-agents/julia/instructions": true,
     },
     // Julia
     "julia.executablePath": "/usr/local/bin/julia",

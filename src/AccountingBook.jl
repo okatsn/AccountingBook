@@ -15,7 +15,7 @@ include("convertdatetime.jl")
 export convertdatetime, GoogleFormTimeTagTW
 
 include("preparesheet.jl")
-export preparesheet
+export preparesheet, preparesheet2
 
 using HypertextLiteral
 include("rendertable.jl")
