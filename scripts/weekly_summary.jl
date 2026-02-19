@@ -19,19 +19,12 @@ arg4 = Dict(
 
 
 
-t1 = now() + Hour(8) # we are at UTC+8
-t0 = t1 - arg4.interval(1)
-
 df = CSV.read(dir_data("expense", "book.csv"), DataFrame)
 df2 = CSV.read(dir_data("transfer", "book.csv"), DataFrame)
 net_expense = CSV.read(dir_data("expense", "summary_overall.csv"), DataFrame)
 net_transfer_by_item = CSV.read(dir_data("transfer", "summary_by_item.csv"), DataFrame)
 
-net_cashflow = @chain net_transfer_by_item begin
-    subset(:assettype => ByRow(x -> x == "現金"))
-    groupby([:whosaccount, :unit])
-    combine(:svalue => sum => :cashflow)
-end
+
 
 
 dfthis = @chain df begin

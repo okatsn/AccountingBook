@@ -6,6 +6,16 @@ using Chain
 const sheetid = ENV["GSHEET_KEY"]
 const sheetid2 = ENV["GSHEET2_KEY"] # The key to the book of transferring.
 
+const this_week = now() |> week
+const this_year = now() |> year
+
+t0_week = floor(now(), Week) + Day(1) + Hour(8) # we are at UTC+8
+t1_week = t0_week + Week(1)
+
+t0_year = floor(now(), Year) + Hour(8) # we are at UTC+8
+t1_year = t0_year + Year(1)
+
+
 
 url = "https://docs.google.com/spreadsheets/d/$sheetid/edit?usp=sharing"
 url2 = "https://docs.google.com/spreadsheets/d/$sheetid2/edit?usp=sharing"
@@ -40,3 +50,10 @@ net_transfer_by_item = @chain df2 begin
 end
 
 CSV.write(dir_data("transfer", "summary_by_item.csv"), net_transfer_by_item)
+
+
+net_cashflow = @chain net_transfer_by_item begin
+    subset(:assettype => ByRow(x -> x == "現金"))
+    groupby([:whosaccount, :unit])
+    combine(:svalue => sum => :cashflow)
+end
