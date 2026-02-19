@@ -2,6 +2,6 @@ stages:
     weekly_summary:
         cmd: julia --project=@. scripts/weekly_summary.jl "Weekly"
         deps:
-            - scripts/weekly_summary
+            - scripts/weekly_summary.jl
         outs:
             - data/temp.csv
