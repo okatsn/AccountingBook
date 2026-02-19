@@ -38,7 +38,7 @@ function preparesheet2(df0a)
     for direction in ["IN", "OUT"]
         expr = Regex("$(direction)_")
         dftmp = select(df0a, :timestr, :email, Cols(expr)) |> emptyprefix!(expr)
-        insertcols!(dftmp, :direction => direction)
+        insertcols!(dftmp, :inout => direction)
         push!(dfas, dftmp)
     end
 
