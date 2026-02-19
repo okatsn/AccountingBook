@@ -95,7 +95,11 @@ msg0 = @htl("""
         <p>
             <p><h1>$subject</h1></p>
 
+            <p><h2>支出/收入:</h2></p>
             <p>$(render_table2(select(dfthis, Not(:email))))</p>
+
+            <p><h2>內部金流:</h2></p>
+            <p>$(render_table2(select(net_transfer_by_item_thisweek, Not(:email))))</p>
 
             <p><h2>Cashflow Summary of This $(arg4.interval):</h2></p>
 
