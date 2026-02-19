@@ -77,11 +77,13 @@ book_svalue(df) = @chain df begin
     select(Not(:inout, :amount))
 end
 
-dfthisweek = filter(:time => (dt -> t1_week > dt ≥ t0_week), df) |> book_svalue
+dfthisweek = filter(:time => (dt -> t1_week > dt ≥ t0_week), df)
 
 
 
-CSV.write(dir_data("expense", "book_thisweek.csv"), dfthisweek)
+
+
+CSV.write(dir_data("expense", "book_thisweek.csv"), dfthisweek |> book_svalue)
 
 dfthisweek_sum = @chain dfthisweek begin
     groupby(:whosaccount)
