@@ -29,5 +29,6 @@ jobs:
                   GMAIL_APP_ADDRESS: ${{ secrets.GMAIL_APP_ADDRESS }}
                   GMAIL_APP_KEY: ${{ secrets.GMAIL_APP_KEY }}
                   GSHEET_KEY: ${{ secrets.GSHEET_KEY }}
+                  GSHEET2_KEY: ${{ secrets.GSHEET2_KEY }}
               run: |
                   julia --project=@. -e 'include("scripts/weekly_summary.jl")' "Weekly"
