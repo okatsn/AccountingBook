@@ -13,6 +13,7 @@ using Dates
 sender = ENV["GMAIL_APP_ADDRESS"]
 passwd = ENV["GMAIL_APP_KEY"]
 sheetid = ENV["GSHEET_KEY"]
+sheetid2 = ENV["GSHEET2_KEY"] # The key to the book of transferring.
 
 arg4 = Dict(
     "Weekly" => Arg4(subject="兩豬家記帳本週摘要", interval=Dates.Week),
@@ -20,7 +21,9 @@ arg4 = Dict(
 )[ARGS[1]] # "Yearly" or "Weekly" - now the first argument
 
 url = "https://docs.google.com/spreadsheets/d/$sheetid/edit?usp=sharing"
+url2 = "https://docs.google.com/spreadsheets/d/$sheetid2/edit?usp=sharing"
 df0 = readgsheet(url)
+df0a = readgsheet(url2)
 
 
 t1 = now() + Hour(8) # we are at UTC+8
