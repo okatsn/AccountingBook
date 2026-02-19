@@ -5,8 +5,8 @@ stages:
     deps:
     - path: scripts/weekly_summary.jl
       hash: md5
-      md5: 73e0b5f35eea3dfc8bb6c08c63e8e7e4
-      size: 4334
+      md5: 8b7d6013b1c722021999bf6eaa2a0626
+      size: 3697
     outs:
     - path: data/temp.csv
       hash: md5
