@@ -34,10 +34,10 @@ CSV.write(dir_data("expense", "book.csv"), df)
 CSV.write(dir_data("transfer", "book.csv"), df2)
 
 net_expense = @chain df begin
-    select(Not([:inout, :amount]), [:inout, :amount] => ByRow((s, v) -> numinout(s) * v) => :flows)
-    groupby(:whosaccount)
-    combine(:flows => sum => :netflow_expense)
-    select(:whosaccount => ByRow(getaccountname), :netflow_expense; renamecols=false)
+    select(Not([:inout, :amount]), [:inout, :amount] => ByRow((s, v) -> numinout(s) * v) => :svalue)
+    groupby([:whosaccount])
+    combine(:svalue => sum => :netflow_expense)
+    select(:whosaccount, :netflow_expense; renamecols=false)
 end
 
 CSV.write(dir_data("expense", "summary_overall.csv"), net_expense)
@@ -62,7 +62,7 @@ end
 
 dfthis = @chain df begin
     filter(:time => (dt -> t1_week > dt ≥ t0_week), _)
-    transform(:memo => ByRow(x -> ifelse(ismissing(x), "", x)), [:inout, :amount] => ByRow((s, v) -> numinout(s) * v) => :flows; renamecols=false)
+    transform(:memo => ByRow(x -> ifelse(ismissing(x), "", x)), [:inout, :amount] => ByRow((s, v) -> numinout(s) * v) => :svalue; renamecols=false)
     select(Not(:inout, :amount))
     transform(:whosaccount => ByRow(getaccountname); renamecols=false)
 end
@@ -71,7 +71,9 @@ CSV.write(dir_data("expense", "book_thisweek.csv"), dfthis)
 
 dfthis_sum = @chain dfthis begin
     groupby(:whosaccount)
-    combine(:flows => sum => :netflow_expense)
+    combine(:svalue => sum => :netflow_expense)
 end
+
+
 
 CSV.write(dir_data("expense", "summary_thisweek.csv"), dfthis_sum)
