@@ -21,7 +21,8 @@ arg4 = Dict(
 
 df = CSV.read(dir_data("expense", "book.csv"), DataFrame)
 df2 = CSV.read(dir_data("transfer", "book.csv"), DataFrame)
-net_expense = CSV.read(dir_data("expense", "summary_overall.csv"), DataFrame)
+net_overall = CSV.read(dir_data("expense", "cashflow_all.csv"), DataFrame)
+net_overall_thisweek = CSV.read(dir_data("expense", "cashflow_all_thisweek.csv"), DataFrame)
 net_transfer_by_item_thisweek = CSV.read(dir_data("transfer", "summary_by_item_thisweek.csv"), DataFrame)
 
 
@@ -97,13 +98,13 @@ msg0 = @htl("""
 
             <p>$(render_table2(select(dfthis, Not(:email))))</p>
 
-            <p><h2>Summary of this $(arg4.interval):</h2></p>
+            <p><h2>Cashflow Summary of This $(arg4.interval):</h2></p>
 
-            <p>$(render_table2(dfthis_sum))</p>
+            <p>$(render_table2(net_overall_thisweek))</p>
 
-            <p><h2>Overall Summary:</h2></p>
+            <p><h2>Overall Cashflow Summary:</h2></p>
 
-            <p>$(render_table2(net_expense))</p>
+            <p>$(render_table2(net_overall))</p>
 
         </p>
 
