@@ -85,7 +85,7 @@ dfthisweek = filter(:time => (dt -> t1_week > dt ≥ t0_week), df)
 
 CSV.write(dir_data("expense", "book_thisweek.csv"), dfthisweek |> book_svalue)
 
-dfthisweek_sum = @chain dfthisweek begin
+dfthisweek_sum = @chain dfthisweek |> book_svalue begin
     groupby(:whosaccount)
     combine(:svalue => sum => :netflow)
 end
