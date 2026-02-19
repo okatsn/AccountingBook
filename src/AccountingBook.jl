@@ -1,6 +1,11 @@
 module AccountingBook
 
 # Write your package code here.
+using Pkg
+
+include("projdir.jl")
+export dir_data, dir_proj
+
 using GoogleDrive, Suppressor, CSV, DataFrames
 include("readgsheet.jl")
 export readgsheet
