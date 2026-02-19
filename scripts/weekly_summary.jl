@@ -22,7 +22,7 @@ arg4 = Dict(
 df = CSV.read(dir_data("expense", "book.csv"), DataFrame)
 df2 = CSV.read(dir_data("transfer", "book.csv"), DataFrame)
 net_expense = CSV.read(dir_data("expense", "summary_overall.csv"), DataFrame)
-net_transfer_by_item = CSV.read(dir_data("transfer", "summary_by_item.csv"), DataFrame)
+net_transfer_by_item_thisweek = CSV.read(dir_data("transfer", "summary_by_item_thisweek.csv"), DataFrame)
 
 
 dfthis = CSV.read(dir_data("expense", "book_thisweek.csv"), DataFrame)
