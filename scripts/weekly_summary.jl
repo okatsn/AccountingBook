@@ -32,8 +32,11 @@ t0 = t1 - arg4.interval(1)
 df = preparesheet(df0)
 df2 = preparesheet2(df0a)
 
-CSV.write(dir_data("expense_book.csv"), df)
-CSV.write(dir_data("transfer_book.csv"), df2)
+
+mkpath(dir_data("transfer"))
+mkpath(dir_data("expense"))
+CSV.write(dir_data("expense", "book.csv"), df)
+CSV.write(dir_data("transfer", "book.csv"), df2)
 
 net_expense = @chain df begin
     select(Not([:inout, :amount]), [:inout, :amount] => ByRow((s, v) -> numinout(s) * v) => :flows)
@@ -42,7 +45,7 @@ net_expense = @chain df begin
     select(:whosaccount => ByRow(getaccountname), :netflow_expense; renamecols=false)
 end
 
-CSV.write(dir_data("net_expense.csv"), net_expense)
+CSV.write(dir_data("expense", "summary_overall.csv"), net_expense)
 
 net_transfer_by_item = @chain df2 begin
     transform(Cols(:inout, :amount) => ByRow((s, v) -> numinout(s) * v) => :svalue)
@@ -52,7 +55,7 @@ net_transfer_by_item = @chain df2 begin
     sort([:whosaccount, :assettype, :item, :unit])
 end
 
-CSV.write(dir_data("net_transfer_by_item.csv"), net_transfer_by_item)
+CSV.write(dir_data("transfer", "summary_by_item.csv"), net_transfer_by_item)
 
 net_cashflow = @chain net_transfer_by_item begin
     subset(:assettype => ByRow(x -> x == "現金"))
