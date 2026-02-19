@@ -43,7 +43,7 @@ recipients = unique(vcat(df.email, df2.email))
 
 
 function render_table2(df)
-    d = Dict(:whosaccount => "帳戶", :item => "品項", :memo => "備註", :svalue => "入/出", :netflow => "淨入/出")
+    d = Dict(:whosaccount => "帳戶", :item => "品項", :memo => "備註", :svalue => "入/出", :netflow => "淨入/出", :unit => "單位")
     renamer(col) = get(d, Symbol(col), col) # rename seems to convert a column name (`col`) to string before sending it to the function (i.e., renamer)
     @chain df begin
         rename(renamer, _)
@@ -99,7 +99,7 @@ msg0 = @htl("""
             <p>$(render_table2(select(dfthis, Not(:email))))</p>
 
             <p><h2>內部金流:</h2></p>
-            <p>$(render_table2(select(net_transfer_by_item_thisweek, Not(:email))))</p>
+            <p>$(render_table2(net_transfer_by_item_thisweek))</p>
 
             <p><h2>Cashflow Summary of This $(arg4.interval):</h2></p>
 
