@@ -35,7 +35,7 @@ df2 = preparesheet2(df0a)
 CSV.write(dir_data("temp.csv"), df2)
 
 
-summary = @chain df begin
+net_expense = @chain df begin
     select(Not([:inout, :amount]), [:inout, :amount] => ByRow((s, v) -> numinout(s) * v) => :flows)
     groupby(:whosaccount)
     combine(:flows => sum => :netflow)
@@ -127,7 +127,7 @@ msg0 = @htl("""
 
             <p><h2>Overall Summary:</h2></p>
 
-            <p>$(render_table2(summary))</p>
+            <p>$(render_table2(net_expense))</p>
 
         </p>
 
