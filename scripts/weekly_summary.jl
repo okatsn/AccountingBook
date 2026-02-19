@@ -31,6 +31,36 @@ t0 = t1 - arg4.interval(1)
 
 df = preparesheet(df0)
 
+
+@chain df0a begin
+    # trasform(Cols(r"^(IN|OUT)_") => ByRow():in_or_out)
+    rename!("時間戳記" => :timestr,
+        "電子郵件地址" => :email)
+end
+
+function emptyprefix!(df0a, expr)
+    f = s -> (split(s, "_") |> last)
+    rename!(f, df0a; cols=Cols(expr))
+end
+
+emptyprefix!(expr) = df -> emptyprefix!(df, expr)
+
+dfas = DataFrame[]
+for direction in ["IN", "OUT"]
+    expr = Regex("$(direction)_")
+    dftmp = select(df0a, :timestr, :email, Cols(expr)) |> emptyprefix!(expr)
+    insertcols!(dftmp, :direction => direction)
+    push!(dfas, dftmp)
+end
+
+reduce(vcat, dfas)
+
+
+select(df0a, :timestr, :email, Cols(r"^IN_")) |> emptyprefix!(r"^IN_")
+df0a_out = select(df0a, :timestr, :email, Cols(r"^OUT_"))
+
+
+
 summary = @chain df begin
     select(Not([:inout, :amount]), [:inout, :amount] => ByRow((s, v) -> numinout(s) * v) => :flows)
     groupby(:whosaccount)
