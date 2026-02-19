@@ -40,16 +40,18 @@ mkpath(dir_data("expense"))
 CSV.write(dir_data("expense", "book.csv"), df)
 CSV.write(dir_data("transfer", "book.csv"), df2)
 
-net_expense = @chain df begin
+summary_expense(df) = @chain df begin
     calc_svalue
     groupby([:whosaccount, :unit])
     combine(:svalue => sum => :netflow)
     sort([:whosaccount, :unit])
 end
 
+net_expense = summary_expense(df)
+
 CSV.write(dir_data("expense", "summary_overall.csv"), net_expense)
 
-net_transfer_by_item = @chain df2 begin
+summary_transfer_all(df2) = @chain df2 begin
     calc_svalue
     groupby([:whosaccount, :item, :assettype, :unit]) # For one's summary (net flow) by item by unit.
     combine(:svalue => sum => :svalue)
@@ -57,14 +59,17 @@ net_transfer_by_item = @chain df2 begin
     sort([:whosaccount, :assettype, :item, :unit])
 end
 
+net_transfer_by_item = summary_transfer_all(df2)
+
 CSV.write(dir_data("transfer", "summary_by_item.csv"), net_transfer_by_item)
 
-
-net_cashflow = @chain net_transfer_by_item begin
+subset_transfer_cash(net_transfer_by_item) = @chain net_transfer_by_item begin
     subset(:assettype => ByRow(x -> x == "現金"))
     groupby([:whosaccount, :unit])
     combine(:svalue => sum => :cashflow)
 end
+
+net_cashflow = subset_transfer_cash(net_transfer_by_item)
 
 
 dfthis = @chain df begin
