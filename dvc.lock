@@ -22,8 +22,8 @@ stages:
     deps:
     - path: scripts/load_data.jl
       hash: md5
-      md5: 51d6d2be1da1d0405e95d581bb06d485
-      size: 2606
+      md5: 135298788e14b643ca116334acea73fd
+      size: 2475
     outs:
     - path: data/expense
       hash: md5
