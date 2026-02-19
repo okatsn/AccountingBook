@@ -11,7 +11,7 @@ const this_week = now() |> week
 const this_year = now() |> year
 const default_unit = "NTD"
 const default_memo = ""
-const timespanfilter = :time => (dt -> t1_week > dt ≥ t0_week)
+timespanfilter(df) = filter(:time => (dt -> t1_week > dt ≥ t0_week), df)
 
 
 
@@ -46,7 +46,7 @@ CSV.write(dir_data("transfer", "book.csv"), df2)
 
 net_transfer_by_item = summary_transfer_all(df2)
 net_cashflow = subset_transfer_cash(net_transfer_by_item)
-dfthisweek = filter(timespanfilter, df)
+dfthisweek = df |> timespanfilter
 dfthisweek_sum = summary_expense(dfthisweek)
 net_expense = summary_expense(df)
 
