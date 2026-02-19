@@ -9,53 +9,23 @@ using Test
 using SMTPClient
 using Dates
 
-# Read secrets from environment variables instead of command-line arguments for security
-sender = ENV["GMAIL_APP_ADDRESS"]
-passwd = ENV["GMAIL_APP_KEY"]
-sheetid = ENV["GSHEET_KEY"]
-sheetid2 = ENV["GSHEET2_KEY"] # The key to the book of transferring.
+const sender = ENV["GMAIL_APP_ADDRESS"]
+const passwd = ENV["GMAIL_APP_KEY"]
 
 arg4 = Dict(
     "Weekly" => Arg4(subject="兩豬家記帳本週摘要", interval=Dates.Week),
     "Yearly" => Arg4(subject="兩豬家記帳本年摘要", interval=Dates.Year),
 )[ARGS[1]] # "Yearly" or "Weekly" - now the first argument
 
-url = "https://docs.google.com/spreadsheets/d/$sheetid/edit?usp=sharing"
-url2 = "https://docs.google.com/spreadsheets/d/$sheetid2/edit?usp=sharing"
-df0 = readgsheet(url)
-df0a = readgsheet(url2)
 
 
 t1 = now() + Hour(8) # we are at UTC+8
 t0 = t1 - arg4.interval(1)
 
-df = preparesheet(df0)
-df2 = preparesheet2(df0a)
-
-
-mkpath(dir_data("transfer"))
-mkpath(dir_data("expense"))
-CSV.write(dir_data("expense", "book.csv"), df)
-CSV.write(dir_data("transfer", "book.csv"), df2)
-
-net_expense = @chain df begin
-    select(Not([:inout, :amount]), [:inout, :amount] => ByRow((s, v) -> numinout(s) * v) => :flows)
-    groupby(:whosaccount)
-    combine(:flows => sum => :netflow_expense)
-    select(:whosaccount => ByRow(getaccountname), :netflow_expense; renamecols=false)
-end
-
-CSV.write(dir_data("expense", "summary_overall.csv"), net_expense)
-
-net_transfer_by_item = @chain df2 begin
-    transform(Cols(:inout, :amount) => ByRow((s, v) -> numinout(s) * v) => :svalue)
-    groupby([:whosaccount, :item, :assettype, :unit]) # For one's summary (net flow) by item by unit.
-    combine(:svalue => sum => :svalue)
-    # describe
-    sort([:whosaccount, :assettype, :item, :unit])
-end
-
-CSV.write(dir_data("transfer", "summary_by_item.csv"), net_transfer_by_item)
+df = CSV.read(dir_data("expense", "book.csv"), DataFrame)
+df2 = CSV.read(dir_data("transfer", "book.csv"), DataFrame)
+net_expense = CSV.read(dir_data("expense", "summary_overall.csv"), DataFrame)
+net_transfer_by_item = CSV.read(dir_data("transfer", "summary_by_item.csv"), DataFrame)
 
 net_cashflow = @chain net_transfer_by_item begin
     subset(:assettype => ByRow(x -> x == "現金"))
@@ -77,7 +47,7 @@ dfthis_sum = @chain dfthis begin
 end
 
 
-recipients = unique(df0[!, "電子郵件地址"])
+recipients = unique(vcat(df.email, df2.email))
 # uniquewhos = unique(df[!, :whosaccount])
 
 

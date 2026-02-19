@@ -3,6 +3,12 @@ stages:
         cmd: julia --project=@. scripts/weekly_summary.jl "Weekly"
         deps:
             - scripts/weekly_summary.jl
+            - data/transfer
+            - data/expense
+    load_data:
+        cmd: julia --project=@. scripts/load_data.jl
+        deps:
+            - scripts/load_data.jl
         outs:
             - data/transfer
             - data/expense
