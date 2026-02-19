@@ -4,4 +4,7 @@ stages:
         deps:
             - scripts/weekly_summary.jl
         outs:
-            - data/temp.csv
+            - data/net_transfer_by_item.csv
+            - data/net_expense.csv
+            - data/expense_book.csv
+            - data/transfer_book.csv
