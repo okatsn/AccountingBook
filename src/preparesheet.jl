@@ -6,7 +6,7 @@ function preparesheet(df0)
             "支出或收入" => :inout,
             "從誰的口袋" => :whosaccount,
             "金額" => :amount,
-            "幣別" => :unit_currency,
+            "幣別" => :unit,
             "備註" => :memo,)
     end
 end
@@ -35,9 +35,8 @@ function preparesheet2(df0a)
             "誰" => :whosaccount,
             "資產類別" => :assettype,
             "項目" => :item,
-            "數量" => :quantity,
-            "單價" => :unit_price,
-            "單價單位" => :unit_unit,
+            "值" => :amount,
+            "單位" => :unit,
             "備註" => :memo,)
         insertcols!(dftmp, :inout => direction)
 
