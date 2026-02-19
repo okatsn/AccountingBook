@@ -55,9 +55,9 @@ end
 
 dfa = reduce(vcat, dfas)
 
-select(dfa, :timestr => ByRow(convertdatetime) => :time, Not(:timestr))
+select!(dfa, :timestr => ByRow(convertdatetime) => :time, Not(:timestr))
 
-
+CSV.write(dir_data("temp.csv"), dfa)
 
 
 summary = @chain df begin
