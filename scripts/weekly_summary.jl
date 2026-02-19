@@ -50,6 +50,11 @@ net_transfer_by_item = @chain df2 begin
     sort([:whosaccount, :assettype, :item, :unit])
 end
 
+net_cashflow = @chain net_transfer_by_item begin
+    subset(:assettype => ByRow(x -> x == "現金"))
+    groupby([:whosaccount, :unit])
+    combine(:svalue => sum => :cashflow)
+end
 
 
 dfthis = @chain df begin
