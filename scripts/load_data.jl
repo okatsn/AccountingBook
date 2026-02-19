@@ -9,7 +9,7 @@ const sheetid2 = ENV["GSHEET2_KEY"] # The key to the book of transferring.
 
 const this_week = now() |> week
 const this_year = now() |> year
-
+const default_unit = "NTD"
 t0_week = floor(now(), Week) + Day(1) + Hour(8) # we are at UTC+8
 t1_week = t0_week + Week(1)
 
@@ -35,9 +35,10 @@ CSV.write(dir_data("transfer", "book.csv"), df2)
 
 net_expense = @chain df begin
     select(Not([:inout, :amount]), [:inout, :amount] => ByRow((s, v) -> numinout(s) * v) => :svalue)
-    groupby([:whosaccount])
+    transform(:unit => ByRow(x -> ifelse(ismissing(x), default_unit, x)); renamecols=false)
+    groupby([:whosaccount, :unit])
     combine(:svalue => sum => :netflow)
-    # select(:whosaccount, :netflow; renamecols=false)
+    sort([:whosaccount, :unit])
 end
 
 CSV.write(dir_data("expense", "summary_overall.csv"), net_expense)
