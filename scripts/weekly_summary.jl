@@ -53,11 +53,10 @@ for direction in ["IN", "OUT"]
     push!(dfas, dftmp)
 end
 
-reduce(vcat, dfas)
+dfa = reduce(vcat, dfas)
 
+select(dfa, :timestr => ByRow(convertdatetime) => :time, Not(:timestr))
 
-select(df0a, :timestr, :email, Cols(r"^IN_")) |> emptyprefix!(r"^IN_")
-df0a_out = select(df0a, :timestr, :email, Cols(r"^OUT_"))
 
 
 
