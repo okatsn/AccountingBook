@@ -50,9 +50,8 @@ net_cashflow = subset_transfer_cash(net_transfer_by_item)
 net_transfer_by_item_thisweek = summary_transfer_all(df2 |> timespanfilter)
 net_cashflow_thisweek = subset_transfer_cash(net_transfer_by_item_thisweek)
 dfthisweek = df |> timespanfilter
-dfthisweek_sum = summary_expense(dfthisweek)
+net_expense_thisweek = summary_expense(dfthisweek)
 net_expense = summary_expense(df)
-net_expense = summary_expense(df |> timespanfilter)
 
 
 overallsummary(net_expense, net_cashflow) = @chain reduce(vcat, [net_expense, net_cashflow]) begin
@@ -61,11 +60,11 @@ overallsummary(net_expense, net_cashflow) = @chain reduce(vcat, [net_expense, ne
 end
 
 net_overall = overallsummary(net_expense, net_cashflow)
-net_overall_thisweek = overallsummary(net_expense, net_cashflow)
+net_overall_thisweek = overallsummary(net_expense_thisweek, net_cashflow_thisweek)
 
 CSV.write(dir_data("combined", "cashflow_all.csv"), net_overall)
 CSV.write(dir_data("combined", "cashflow_all_thisweek.csv"), net_overall_thisweek)
 CSV.write(dir_data("transfer", "summary_by_item_thisweek.csv"), net_transfer_by_item_thisweek)
 CSV.write(dir_data("expense", "book_thisweek.csv"), dfthisweek |> book_svalue)
-CSV.write(dir_data("expense", "summary_thisweek.csv"), dfthisweek_sum)
+CSV.write(dir_data("expense", "summary_thisweek.csv"), net_expense_thisweek)
 CSV.write(dir_data("expense", "summary_overall.csv"), net_expense)
