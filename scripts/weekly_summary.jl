@@ -43,7 +43,7 @@ recipients = unique(vcat(df.email, df2.email))
 
 
 function render_table2(df)
-    d = Dict(:whosaccount => "帳戶", :item => "品項", :memo => "備註", :svalue => "入/出", :netflow_expense => "淨入/出")
+    d = Dict(:whosaccount => "帳戶", :item => "品項", :memo => "備註", :svalue => "入/出", :netflow => "淨入/出")
     renamer(col) = get(d, Symbol(col), col) # rename seems to convert a column name (`col`) to string before sending it to the function (i.e., renamer)
     @chain df begin
         rename(renamer, _)
