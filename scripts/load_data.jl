@@ -52,6 +52,11 @@ subset_transfer_cash(net_transfer_by_item) = @chain net_transfer_by_item begin
     combine(:svalue => sum => :cashflow)
 end
 
+"""
+Create a new column of `svalue`.
+"""
+calc_svalue(df) = transform(df, Cols(:inout, :amount) => ByRow((s, v) -> numinout(s) * v) => :svalue)
+
 
 
 t0_week = floor(now(), Week) + Day(1) + Hour(8) # we are at UTC+8
@@ -60,7 +65,6 @@ t1_week = t0_week + Week(1)
 t0_year = floor(now(), Year) + Hour(8) # we are at UTC+8
 t1_year = t0_year + Year(1)
 
-calc_svalue = df -> transform(df, Cols(:inout, :amount) => ByRow((s, v) -> numinout(s) * v) => :svalue)
 
 url = "https://docs.google.com/spreadsheets/d/$sheetid/edit?usp=sharing"
 url2 = "https://docs.google.com/spreadsheets/d/$sheetid2/edit?usp=sharing"
