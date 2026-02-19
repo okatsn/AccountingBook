@@ -28,6 +28,9 @@ net_transfer_by_item_thisweek = CSV.read(dir_data("transfer", "summary_by_item_t
 
 dfthis = CSV.read(dir_data("expense", "book_thisweek.csv"), DataFrame)
 
+transform!(dfthis,
+    :memo => ByRow(x -> ifelse(ismissing(x), "", x)),
+    ; renamecols=false)
 
 
 
