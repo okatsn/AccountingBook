@@ -30,15 +30,9 @@ t1 = now() + Hour(8) # we are at UTC+8
 t0 = t1 - arg4.interval(1)
 
 df = preparesheet(df0)
+df2 = preparesheet2(df0a)
 
-
-@chain df0a begin
-    # trasform(Cols(r"^(IN|OUT)_") => ByRow():in_or_out)
-    rename!("時間戳記" => :timestr,
-        "電子郵件地址" => :email)
-end
-
-
+CSV.write(dir_data("temp.csv"), df2)
 
 
 

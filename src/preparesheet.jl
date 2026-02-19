@@ -19,6 +19,12 @@ end
 emptyprefix!(expr) = df -> emptyprefix!(df, expr)
 
 function preparesheet2(df0a)
+    @chain df0a begin
+        # trasform(Cols(r"^(IN|OUT)_") => ByRow():in_or_out)
+        rename!("時間戳記" => :timestr,
+            "電子郵件地址" => :email)
+    end
+
     dfas = DataFrame[]
     for direction in ["IN", "OUT"]
         expr = Regex("$(direction)_")
