@@ -38,24 +38,8 @@ df = preparesheet(df0)
         "電子郵件地址" => :email)
 end
 
-function emptyprefix!(df0a, expr)
-    f = s -> (split(s, "_") |> last)
-    rename!(f, df0a; cols=Cols(expr))
-end
 
-emptyprefix!(expr) = df -> emptyprefix!(df, expr)
 
-dfas = DataFrame[]
-for direction in ["IN", "OUT"]
-    expr = Regex("$(direction)_")
-    dftmp = select(df0a, :timestr, :email, Cols(expr)) |> emptyprefix!(expr)
-    insertcols!(dftmp, :direction => direction)
-    push!(dfas, dftmp)
-end
-
-dfa = reduce(vcat, dfas)
-
-select(dfa, :timestr => ByRow(convertdatetime) => :time, Not(:timestr))
 
 
 
