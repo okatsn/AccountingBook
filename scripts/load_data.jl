@@ -11,6 +11,48 @@ const this_week = now() |> week
 const this_year = now() |> year
 const default_unit = "NTD"
 const default_memo = ""
+
+"""
+Process table's input/output category and absolute values to signed values
+"""
+book_svalue(df) = @chain df begin
+    calc_svalue
+    select(Not(:inout, :amount))
+end
+
+"""
+Process table of expense to sum by account and unit.
+"""
+summary_expense(df) = @chain df begin
+    calc_svalue
+    groupby([:whosaccount, :unit])
+    combine(:svalue => sum => :netflow)
+    sort([:whosaccount, :unit])
+end
+
+"""
+Process the table of transfer by item and unit (and of course by account)
+"""
+summary_transfer_all(df2) = @chain df2 begin
+    calc_svalue
+    groupby([:whosaccount, :item, :assettype, :unit]) # For one's summary (net flow) by item by unit.
+    combine(:svalue => sum => :svalue)
+    # describe
+    sort([:whosaccount, :assettype, :item, :unit])
+end
+
+
+"""
+With the output of `summary_transfer_all`, get the summary for only cashflow.
+"""
+subset_transfer_cash(net_transfer_by_item) = @chain net_transfer_by_item begin
+    subset(:assettype => ByRow(x -> x == "現金"))
+    groupby([:whosaccount, :unit])
+    combine(:svalue => sum => :cashflow)
+end
+
+
+
 t0_week = floor(now(), Week) + Day(1) + Hour(8) # we are at UTC+8
 t1_week = t0_week + Week(1)
 
@@ -40,53 +82,14 @@ mkpath(dir_data("expense"))
 CSV.write(dir_data("expense", "book.csv"), df)
 CSV.write(dir_data("transfer", "book.csv"), df2)
 
-summary_expense(df) = @chain df begin
-    calc_svalue
-    groupby([:whosaccount, :unit])
-    combine(:svalue => sum => :netflow)
-    sort([:whosaccount, :unit])
-end
-
-net_expense = summary_expense(df)
-
-CSV.write(dir_data("expense", "summary_overall.csv"), net_expense)
-
-summary_transfer_all(df2) = @chain df2 begin
-    calc_svalue
-    groupby([:whosaccount, :item, :assettype, :unit]) # For one's summary (net flow) by item by unit.
-    combine(:svalue => sum => :svalue)
-    # describe
-    sort([:whosaccount, :assettype, :item, :unit])
-end
 
 net_transfer_by_item = summary_transfer_all(df2)
+net_cashflow = subset_transfer_cash(net_transfer_by_item)
+dfthisweek = filter(:time => (dt -> t1_week > dt ≥ t0_week), df)
+dfthisweek_sum = summary_expense(dfthisweek)
+net_expense = summary_expense(df)
 
 CSV.write(dir_data("transfer", "summary_by_item.csv"), net_transfer_by_item)
-
-subset_transfer_cash(net_transfer_by_item) = @chain net_transfer_by_item begin
-    subset(:assettype => ByRow(x -> x == "現金"))
-    groupby([:whosaccount, :unit])
-    combine(:svalue => sum => :cashflow)
-end
-
-net_cashflow = subset_transfer_cash(net_transfer_by_item)
-
-
-book_svalue(df) = @chain df begin
-    calc_svalue
-    select(Not(:inout, :amount))
-end
-
-dfthisweek = filter(:time => (dt -> t1_week > dt ≥ t0_week), df)
-
-
-
-
-
 CSV.write(dir_data("expense", "book_thisweek.csv"), dfthisweek |> book_svalue)
-
-dfthisweek_sum = summary_expense(dfthisweek)
-
-
-
 CSV.write(dir_data("expense", "summary_thisweek.csv"), dfthisweek_sum)
+CSV.write(dir_data("expense", "summary_overall.csv"), net_expense)
