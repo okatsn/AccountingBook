@@ -76,7 +76,6 @@ dfthis = @chain df begin
     filter(:time => (dt -> t1_week > dt ≥ t0_week), _)
     calc_svalue
     select(Not(:inout, :amount))
-    transform(:whosaccount => ByRow(getaccountname); renamecols=false)
 end
 
 CSV.write(dir_data("expense", "book_thisweek.csv"), dfthis)
