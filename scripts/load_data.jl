@@ -17,7 +17,7 @@ t1_week = t0_week + Week(1)
 t0_year = floor(now(), Year) + Hour(8) # we are at UTC+8
 t1_year = t0_year + Year(1)
 
-
+calc_svalue = df -> transform(df, Cols(:inout, :amount) => ByRow((s, v) -> numinout(s) * v) => :svalue)
 
 url = "https://docs.google.com/spreadsheets/d/$sheetid/edit?usp=sharing"
 url2 = "https://docs.google.com/spreadsheets/d/$sheetid2/edit?usp=sharing"
@@ -41,7 +41,7 @@ CSV.write(dir_data("expense", "book.csv"), df)
 CSV.write(dir_data("transfer", "book.csv"), df2)
 
 net_expense = @chain df begin
-    select(Not([:inout, :amount]), [:inout, :amount] => ByRow((s, v) -> numinout(s) * v) => :svalue)
+    calc_svalue
     groupby([:whosaccount, :unit])
     combine(:svalue => sum => :netflow)
     sort([:whosaccount, :unit])
@@ -50,7 +50,7 @@ end
 CSV.write(dir_data("expense", "summary_overall.csv"), net_expense)
 
 net_transfer_by_item = @chain df2 begin
-    transform(Cols(:inout, :amount) => ByRow((s, v) -> numinout(s) * v) => :svalue)
+    calc_svalue
     groupby([:whosaccount, :item, :assettype, :unit]) # For one's summary (net flow) by item by unit.
     combine(:svalue => sum => :svalue)
     # describe
@@ -69,7 +69,7 @@ end
 
 dfthis = @chain df begin
     filter(:time => (dt -> t1_week > dt ≥ t0_week), _)
-    transform([:inout, :amount] => ByRow((s, v) -> numinout(s) * v) => :svalue; renamecols=false)
+    calc_svalue
     select(Not(:inout, :amount))
     transform(:whosaccount => ByRow(getaccountname); renamecols=false)
 end
