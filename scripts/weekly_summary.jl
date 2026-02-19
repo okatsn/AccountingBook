@@ -42,6 +42,14 @@ net_expense = @chain df begin
     select(:whosaccount => ByRow(getaccountname), :netflow; renamecols=false)
 end
 
+net_transfer_by_item = @chain df2 begin
+    transform(Cols(:inout, :amount) => ByRow((s, v) -> numinout(s) * v) => :svalue)
+    groupby([:whosaccount, :item, :assettype, :unit]) # For one's summary (net flow) by item by unit.
+    combine(:svalue => sum)
+    # describe
+end
+
+
 
 dfthis = @chain df begin
     filter(:time => (dt -> t1 > dt ≥ t0), _)
