@@ -67,11 +67,11 @@ dfthis = @chain df begin
     transform(:whosaccount => ByRow(getaccountname); renamecols=false)
 end
 
-CSV.write(dir_data("transfer", "book_thisweek.csv"), dfthis)
+CSV.write(dir_data("expense", "book_thisweek.csv"), dfthis)
 
 dfthis_sum = @chain dfthis begin
     groupby(:whosaccount)
     combine(:flows => sum => :netflow_expense)
 end
 
-CSV.write(dir_data("transfer", "summary_thisweek.csv"), dfthis_sum)
+CSV.write(dir_data("expense", "summary_thisweek.csv"), dfthis_sum)
