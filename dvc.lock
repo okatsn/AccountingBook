@@ -5,18 +5,18 @@ stages:
     deps:
     - path: data/expense
       hash: md5
-      md5: 4e081379c92199720317e27ea307eee4.dir
-      size: 105390
+      md5: cb147108d61dae086d3e87b18d4bd080.dir
+      size: 105361
       nfiles: 4
     - path: data/transfer
       hash: md5
-      md5: 4a8b36b784d97050a0f887b730d65767.dir
+      md5: 90e6c5d03eec725fb79b5ac7abe47d64.dir
       size: 843
       nfiles: 2
     - path: scripts/weekly_summary.jl
       hash: md5
-      md5: 976417aff7b88c2781bc5329c79a279b
-      size: 2908
+      md5: 17b51979098189bac8b12b2e29cc5843
+      size: 2968
   load_data:
     cmd: julia --project=@. scripts/load_data.jl
     deps:
