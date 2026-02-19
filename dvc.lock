@@ -1,0 +1,14 @@
+schema: '2.0'
+stages:
+  weekly_summary:
+    cmd: julia --project=@. scripts/weekly_summary.jl "Weekly"
+    deps:
+    - path: scripts/weekly_summary.jl
+      hash: md5
+      md5: 73e0b5f35eea3dfc8bb6c08c63e8e7e4
+      size: 4334
+    outs:
+    - path: data/temp.csv
+      hash: md5
+      md5: a3d5e51a3797c7f97e78bff8e239f0f7
+      size: 236
