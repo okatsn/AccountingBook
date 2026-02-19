@@ -38,8 +38,8 @@ CSV.write(dir_data("temp.csv"), df2)
 net_expense = @chain df begin
     select(Not([:inout, :amount]), [:inout, :amount] => ByRow((s, v) -> numinout(s) * v) => :flows)
     groupby(:whosaccount)
-    combine(:flows => sum => :netflow)
-    select(:whosaccount => ByRow(getaccountname), :netflow; renamecols=false)
+    combine(:flows => sum => :netflow_expense)
+    select(:whosaccount => ByRow(getaccountname), :netflow_expense; renamecols=false)
 end
 
 net_transfer_by_item = @chain df2 begin
@@ -66,7 +66,7 @@ end
 
 dfthis_sum = @chain dfthis begin
     groupby(:whosaccount)
-    combine(:flows => sum => :netflow)
+    combine(:flows => sum => :netflow_expense)
 end
 
 
@@ -81,7 +81,7 @@ recipients = unique(df0[!, "電子郵件地址"])
 
 
 function render_table2(df)
-    d = Dict(:whosaccount => "帳戶", :item => "品項", :memo => "備註", :flows => "入/出", :netflow => "淨入/出")
+    d = Dict(:whosaccount => "帳戶", :item => "品項", :memo => "備註", :flows => "入/出", :netflow_expense => "淨入/出")
     renamer(col) = get(d, Symbol(col), col) # rename seems to convert a column name (`col`) to string before sending it to the function (i.e., renamer)
     @chain df begin
         rename(renamer, _)
