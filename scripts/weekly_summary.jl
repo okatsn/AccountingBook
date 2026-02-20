@@ -82,6 +82,10 @@ msg0 = @htl("""
             font-weight: bold;
         }
 
+        small {
+            font-size: 10px;
+        }
+
         table {
             border-collapse: collapse;
             width: 100%;
@@ -101,14 +105,14 @@ msg0 = @htl("""
             <p><h2>支出/收入:</h2></p>
             <p>$(render_table2(select(dfthis, Not(:email))))</p>
 
-            <p><h2>內部金流:</h2></p>
+            <p><h2>Net Transfer of Everything:</h2></p>
             <p>$(render_table2(net_transfer_by_item_thisweek))</p>
 
-            <p><h2>Cashflow Summary of This $(arg4.interval):</h2></p>
-
+            <p><h2>Net Flow of This $(arg4.interval):</h2></p>
+            <p><small>(Flow = Expense + Transfer)</small></p>
             <p>$(render_table2(net_overall_thisweek))</p>
 
-            <p><h2>Overall Cashflow Summary:</h2></p>
+            <p><h2>Net Flow of All Time:</h2></p>
 
             <p>$(render_table2(net_overall))</p>
 
