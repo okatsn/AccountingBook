@@ -11,12 +11,12 @@ const this_week = now() |> week
 const this_year = now() |> year
 const default_unit = "NTD"
 const default_memo = ""
+
+
 timespanfilter(df) = filter(:time => (dt -> t1_week > dt ≥ t0_week), df)
 
-
-
-t0_week = floor(now(), Week) + Day(1) + Hour(8) # we are at UTC+8
-t1_week = t0_week + Week(1)
+t1_week = floor(now(), Week) + Day(1) + Hour(8) # we are at UTC+8
+t0_week = t1_week - Week(1)
 
 t0_year = floor(now(), Year) + Hour(8) # we are at UTC+8
 t1_year = t0_year + Year(1)
