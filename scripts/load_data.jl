@@ -15,7 +15,7 @@ const default_memo = ""
 
 timespanfilter(df) = filter(:time => (dt -> t1_week > dt ≥ t0_week), df)
 
-t1_week = floor(now(), Week) + Day(1) + Hour(8) # we are at UTC+8
+t1_week = floor(now(), Week) + Day(5) + Hour(8) # we are at UTC+8
 t0_week = t1_week - Week(1)
 
 t0_year = floor(now(), Year) + Hour(8) # we are at UTC+8
