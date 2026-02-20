@@ -32,7 +32,7 @@ end
 With the output of `summary_transfer_all`, get the summary for only cashflow.
 """
 subset_transfer_cash(net_transfer_by_item) = @chain net_transfer_by_item begin
-    subset(:pooltype => ByRow(x -> x == "現金"))
+    subset(:pooltype => ByRow(x -> x == "緩存區"))
     groupby([:whosaccount, :unit])
     combine(:svalue => sum => :netflow)
 end
