@@ -1,0 +1,42 @@
+schema: '2.0'
+stages:
+  weekly_summary:
+    cmd: julia --project=@. scripts/weekly_summary.jl "Weekly"
+    deps:
+    - path: data/expense
+      hash: md5
+      md5: 589218c07f931e8bc8b5ed7365525c7f.dir
+      size: 105611
+      nfiles: 4
+    - path: data/transfer
+      hash: md5
+      md5: f16b59cd23410c3e56dcaba6191a109c.dir
+      size: 697
+      nfiles: 2
+    - path: scripts/weekly_summary.jl
+      hash: md5
+      md5: 1c649979e52dcecc1604ab820016b784
+      size: 5068
+  load_data:
+    cmd: julia --project=@. scripts/load_data.jl
+    deps:
+    - path: scripts/load_data.jl
+      hash: md5
+      md5: 144e8be4b7dab6e163a8b7be4d1baeb6
+      size: 2462
+    outs:
+    - path: data/combined
+      hash: md5
+      md5: 584b52ff535392ce1a89841fdd4789de.dir
+      size: 207
+      nfiles: 2
+    - path: data/expense
+      hash: md5
+      md5: 589218c07f931e8bc8b5ed7365525c7f.dir
+      size: 105611
+      nfiles: 4
+    - path: data/transfer
+      hash: md5
+      md5: f16b59cd23410c3e56dcaba6191a109c.dir
+      size: 697
+      nfiles: 2

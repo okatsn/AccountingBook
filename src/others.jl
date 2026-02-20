@@ -1,6 +1,6 @@
 # These are repo-specific functions.
 
-numinout(str) = Dict("支出" => -1, "收入" => 1)[str]
+numinout(str) = Dict("支出" => -1, "收入" => 1, "IN" => 1, "OUT" => -1)[str]
 getmatch(expr, str) = getproperty(match(expr, str), :match)
 
 getaccountname(s) = getmatch(r"[\u4e00-\u9fff]+", s) # matches only chinese character
