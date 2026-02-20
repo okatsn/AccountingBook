@@ -26,8 +26,20 @@ net_overall_thisweek = CSV.read(dir_data("combined", "summary_thisweek.csv"), Da
 net_transfer_by_item_thisweek = CSV.read(dir_data("transfer", "summary_by_item_thisweek.csv"), DataFrame)
 net_expense_thisweek = CSV.read(dir_data("expense", "summary_thisweek.csv"), DataFrame)
 net_expense = CSV.read(dir_data("expense", "summary_overall.csv"), DataFrame)
+df2_thisweek = timespanfilter(df2, now())
 
 
+df2_thisweek_display = @chain df2_thisweek begin
+    sort([:time])
+    sort([:inout]; rev=true) # to ensure point in the correct direction
+    groupby([:time]; sort=false) # set `false` to ensure the same order
+    combine(
+        :time => (dt -> dt |> unique |> only |> string) => "時間",
+        :whosaccount => (v -> "$(first(v)) ➡️ $(last(v))") => "方向",
+        Cols(:item, :amount, :unit) => ((i, a, u) -> "$(first(i)) $(first(a)) $(first(u)) ➡️ $(last(i)) $(last(a)) $(last(u))") => "品項"
+    )
+    select(Not(:time))
+end
 
 expense_thisweek = CSV.read(dir_data("expense", "book_thisweek.csv"), DataFrame)
 
@@ -105,8 +117,11 @@ msg0 = @htl("""
         <p>
             <p><h1>$subject</h1></p>
 
-            <p><h2>支出/收入:</h2></p>
+            <p><h2>Expense Detail(終端支出/收入):</h2></p>
             <p>$(render_table2(select(expense_thisweek, Not(:email))))</p>
+
+            <p><h2>Transfer Detail:</h2></p>
+            <p>$(render_table2(df2_thisweek_display))</p>
 
             <p><h2>Net Expense of This $(arg4.interval):</h2></p>
             <p>$(render_table2(net_expense_thisweek))</p>
