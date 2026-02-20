@@ -10,12 +10,16 @@ const sheetid2 = ENV["GSHEET2_KEY"] # The key to the book of transferring.
 const this_week = now() |> week
 const this_year = now() |> year
 const default_unit = "NTD"
+const default_memo = ""
+timespanfilter(df) = filter(:time => (dt -> t1_week > dt ≥ t0_week), df)
+
+
+
 t0_week = floor(now(), Week) + Day(1) + Hour(8) # we are at UTC+8
 t1_week = t0_week + Week(1)
 
 t0_year = floor(now(), Year) + Hour(8) # we are at UTC+8
 t1_year = t0_year + Year(1)
-
 
 
 url = "https://docs.google.com/spreadsheets/d/$sheetid/edit?usp=sharing"
@@ -27,54 +31,40 @@ df0a = readgsheet(url2)
 df = preparesheet(df0)
 df2 = preparesheet2(df0a)
 
+for dfi in [df, df2]
+    transform!(dfi,
+        :unit => ByRow(x -> ifelse(ismissing(x), default_unit, x)),
+        :memo => ByRow(x -> ifelse(ismissing(x), default_memo, x))
+        ; renamecols=false)
+end
 
 mkpath(dir_data("transfer"))
 mkpath(dir_data("expense"))
+mkpath(dir_data("combined"))
 CSV.write(dir_data("expense", "book.csv"), df)
 CSV.write(dir_data("transfer", "book.csv"), df2)
 
-net_expense = @chain df begin
-    select(Not([:inout, :amount]), [:inout, :amount] => ByRow((s, v) -> numinout(s) * v) => :svalue)
-    transform(:unit => ByRow(x -> ifelse(ismissing(x), default_unit, x)); renamecols=false)
+
+net_transfer_by_item = summary_transfer_all(df2)
+net_cashflow = subset_transfer_cash(net_transfer_by_item)
+net_transfer_by_item_thisweek = summary_transfer_all(df2 |> timespanfilter)
+net_cashflow_thisweek = subset_transfer_cash(net_transfer_by_item_thisweek)
+dfthisweek = df |> timespanfilter
+net_expense_thisweek = summary_expense(dfthisweek)
+net_expense = summary_expense(df)
+
+
+overallsummary(net_expense, net_cashflow) = @chain reduce(vcat, [net_expense, net_cashflow]) begin
     groupby([:whosaccount, :unit])
-    combine(:svalue => sum => :netflow)
-    sort([:whosaccount, :unit])
+    combine(:netflow => sum; renamecols=false)
 end
 
+net_overall = overallsummary(net_expense, net_cashflow)
+net_overall_thisweek = overallsummary(net_expense_thisweek, net_cashflow_thisweek)
+
+CSV.write(dir_data("combined", "cashflow_all.csv"), net_overall)
+CSV.write(dir_data("combined", "cashflow_all_thisweek.csv"), net_overall_thisweek)
+CSV.write(dir_data("transfer", "summary_by_item_thisweek.csv"), net_transfer_by_item_thisweek)
+CSV.write(dir_data("expense", "book_thisweek.csv"), dfthisweek |> book_svalue)
+CSV.write(dir_data("expense", "summary_thisweek.csv"), net_expense_thisweek)
 CSV.write(dir_data("expense", "summary_overall.csv"), net_expense)
-
-net_transfer_by_item = @chain df2 begin
-    transform(Cols(:inout, :amount) => ByRow((s, v) -> numinout(s) * v) => :svalue)
-    groupby([:whosaccount, :item, :assettype, :unit]) # For one's summary (net flow) by item by unit.
-    combine(:svalue => sum => :svalue)
-    # describe
-    sort([:whosaccount, :assettype, :item, :unit])
-end
-
-CSV.write(dir_data("transfer", "summary_by_item.csv"), net_transfer_by_item)
-
-
-net_cashflow = @chain net_transfer_by_item begin
-    subset(:assettype => ByRow(x -> x == "現金"))
-    groupby([:whosaccount, :unit])
-    combine(:svalue => sum => :cashflow)
-end
-
-
-dfthis = @chain df begin
-    filter(:time => (dt -> t1_week > dt ≥ t0_week), _)
-    transform(:memo => ByRow(x -> ifelse(ismissing(x), "", x)), [:inout, :amount] => ByRow((s, v) -> numinout(s) * v) => :svalue; renamecols=false)
-    select(Not(:inout, :amount))
-    transform(:whosaccount => ByRow(getaccountname); renamecols=false)
-end
-
-CSV.write(dir_data("expense", "book_thisweek.csv"), dfthis)
-
-dfthis_sum = @chain dfthis begin
-    groupby(:whosaccount)
-    combine(:svalue => sum => :netflow)
-end
-
-
-
-CSV.write(dir_data("expense", "summary_thisweek.csv"), dfthis_sum)

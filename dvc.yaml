@@ -12,3 +12,4 @@ stages:
         outs:
             - data/transfer
             - data/expense
+            - data/combined

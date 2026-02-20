@@ -21,13 +21,16 @@ arg4 = Dict(
 
 df = CSV.read(dir_data("expense", "book.csv"), DataFrame)
 df2 = CSV.read(dir_data("transfer", "book.csv"), DataFrame)
-net_expense = CSV.read(dir_data("expense", "summary_overall.csv"), DataFrame)
-net_transfer_by_item = CSV.read(dir_data("transfer", "summary_by_item.csv"), DataFrame)
+net_overall = CSV.read(dir_data("combined", "cashflow_all.csv"), DataFrame)
+net_overall_thisweek = CSV.read(dir_data("combined", "cashflow_all_thisweek.csv"), DataFrame)
+net_transfer_by_item_thisweek = CSV.read(dir_data("transfer", "summary_by_item_thisweek.csv"), DataFrame)
 
 
 dfthis = CSV.read(dir_data("expense", "book_thisweek.csv"), DataFrame)
-dfthis_sum = CSV.read(dir_data("expense", "summary_thisweek.csv"), DataFrame)
 
+transform!(dfthis,
+    :memo => ByRow(x -> ifelse(ismissing(x), "", x)),
+    ; renamecols=false)
 
 
 
@@ -43,7 +46,7 @@ recipients = unique(vcat(df.email, df2.email))
 
 
 function render_table2(df)
-    d = Dict(:whosaccount => "帳戶", :item => "品項", :memo => "備註", :svalue => "入/出", :netflow => "淨入/出")
+    d = Dict(:whosaccount => "帳戶", :item => "品項", :memo => "備註", :svalue => "入/出", :netflow => "淨入/出", :unit => "單位")
     renamer(col) = get(d, Symbol(col), col) # rename seems to convert a column name (`col`) to string before sending it to the function (i.e., renamer)
     @chain df begin
         rename(renamer, _)
@@ -95,15 +98,19 @@ msg0 = @htl("""
         <p>
             <p><h1>$subject</h1></p>
 
+            <p><h2>支出/收入:</h2></p>
             <p>$(render_table2(select(dfthis, Not(:email))))</p>
 
-            <p><h2>Summary of this $(arg4.interval):</h2></p>
+            <p><h2>內部金流:</h2></p>
+            <p>$(render_table2(net_transfer_by_item_thisweek))</p>
 
-            <p>$(render_table2(dfthis_sum))</p>
+            <p><h2>Cashflow Summary of This $(arg4.interval):</h2></p>
 
-            <p><h2>Overall Summary:</h2></p>
+            <p>$(render_table2(net_overall_thisweek))</p>
 
-            <p>$(render_table2(net_expense))</p>
+            <p><h2>Overall Cashflow Summary:</h2></p>
+
+            <p>$(render_table2(net_overall))</p>
 
         </p>
 
