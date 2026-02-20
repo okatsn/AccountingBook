@@ -62,8 +62,8 @@ end
 net_overall = overallsummary(net_expense, net_cashflow)
 net_overall_thisweek = overallsummary(net_expense_thisweek, net_cashflow_thisweek)
 
-CSV.write(dir_data("combined", "cashflow_all.csv"), net_overall)
-CSV.write(dir_data("combined", "cashflow_all_thisweek.csv"), net_overall_thisweek)
+CSV.write(dir_data("combined", "summary_overall.csv"), net_overall)
+CSV.write(dir_data("combined", "summary_thisweek.csv"), net_overall_thisweek)
 CSV.write(dir_data("transfer", "summary_by_item_thisweek.csv"), net_transfer_by_item_thisweek)
 CSV.write(dir_data("expense", "book_thisweek.csv"), dfthisweek |> book_svalue)
 CSV.write(dir_data("expense", "summary_thisweek.csv"), net_expense_thisweek)

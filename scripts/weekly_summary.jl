@@ -21,8 +21,8 @@ arg4 = Dict(
 
 df = CSV.read(dir_data("expense", "book.csv"), DataFrame)
 df2 = CSV.read(dir_data("transfer", "book.csv"), DataFrame)
-net_overall = CSV.read(dir_data("combined", "cashflow_all.csv"), DataFrame)
-net_overall_thisweek = CSV.read(dir_data("combined", "cashflow_all_thisweek.csv"), DataFrame)
+net_overall = CSV.read(dir_data("combined", "summary_overall.csv"), DataFrame)
+net_overall_thisweek = CSV.read(dir_data("combined", "summary_thisweek.csv"), DataFrame)
 net_transfer_by_item_thisweek = CSV.read(dir_data("transfer", "summary_by_item_thisweek.csv"), DataFrame)
 net_expense_thisweek = CSV.read(dir_data("expense", "summary_thisweek.csv"), DataFrame)
 net_expense = CSV.read(dir_data("expense", "summary_overall.csv"), DataFrame)
