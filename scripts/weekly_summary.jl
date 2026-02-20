@@ -24,6 +24,9 @@ df2 = CSV.read(dir_data("transfer", "book.csv"), DataFrame)
 net_overall = CSV.read(dir_data("combined", "cashflow_all.csv"), DataFrame)
 net_overall_thisweek = CSV.read(dir_data("combined", "cashflow_all_thisweek.csv"), DataFrame)
 net_transfer_by_item_thisweek = CSV.read(dir_data("transfer", "summary_by_item_thisweek.csv"), DataFrame)
+net_expense_thisweek = CSV.read(dir_data("expense", "summary_thisweek.csv"), DataFrame)
+net_expense = CSV.read(dir_data("expense", "summary_overall.csv"), DataFrame)
+
 
 
 expense_thisweek = CSV.read(dir_data("expense", "book_thisweek.csv"), DataFrame)
@@ -104,6 +107,9 @@ msg0 = @htl("""
 
             <p><h2>支出/收入:</h2></p>
             <p>$(render_table2(select(expense_thisweek, Not(:email))))</p>
+
+            <p><h2>Net Expense of This $(arg4.interval):</h2></p>
+            <p>$(render_table2(net_expense_thisweek))</p>
 
             <p><h2>Net Transfer of Everything:</h2></p>
             <p>$(render_table2(net_transfer_by_item_thisweek))</p>
