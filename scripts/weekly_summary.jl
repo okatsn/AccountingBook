@@ -29,28 +29,32 @@ net_expense = CSV.read(dir_data("expense", "summary_overall.csv"), DataFrame)
 df2_thisweek = timespanfilter(df2, now())
 
 
-df2_thisweek_display = @chain df2_thisweek begin
-    sort([:time])
-    sort([:inout]; rev=true) # to ensure point in the correct direction
-    groupby([:time]; sort=false) # set `false` to ensure the same order
-    combine(
-        :time => (dt -> dt |> unique |> only |> string) => "時間",
-        :whosaccount => (v -> "$(first(v)) ➡️ $(last(v))") => "方向",
-        Cols(:item, :amount, :unit) => ((i, a, u) -> "$(first(i)) $(first(a)) $(first(u)) ➡️ $(last(i)) $(last(a)) $(last(u))") => "品項"
-    )
-    select(Not(:time))
+df2_thisweek_display = if nrow(df2_thisweek) == 0
+    DataFrame("方向" => String[], "品項" => String[])
+else
+    @chain df2_thisweek begin
+        sort([:time])
+        sort([:inout]; rev=true) # to ensure point in the correct direction
+        groupby([:time]; sort=false) # set `false` to ensure the same order
+        combine(
+            :time => (dt -> dt |> unique |> only |> string) => "時間",
+            :whosaccount => (v -> "$(first(v)) ➡️ $(last(v))") => "方向",
+            Cols(:item, :amount, :unit) => ((i, a, u) -> "$(first(i)) $(first(a)) $(first(u)) ➡️ $(last(i)) $(last(a)) $(last(u))") => "品項"
+        )
+        select(Not(:time))
+    end
 end
 
 expense_thisweek = CSV.read(dir_data("expense", "book_thisweek.csv"), DataFrame)
 
-transform!(expense_thisweek,
-    :memo => ByRow(x -> ifelse(ismissing(x), "", x)),
-    ; renamecols=false)
+if nrow(expense_thisweek) > 0
+    transform!(expense_thisweek,
+        :memo => ByRow(x -> ifelse(ismissing(x), "", x)),
+        ; renamecols=false)
+end
 
 
-
-
-recipients = unique(vcat(df.email, df2.email))
+recipients = unique(skipmissing(vcat(df.email, df2.email))) |> collect
 # uniquewhos = unique(df[!, :whosaccount])
 
 
@@ -67,6 +71,12 @@ function render_table2(df)
         rename(renamer, _)
         render_table
     end
+end
+
+"""Render a DataFrame as an HTML table, or show a 'no data' message when empty."""
+function render_section(df; empty_msg="No data for this period.")
+    nrow(df) == 0 && return @htl("<p><em>$(empty_msg)</em></p>")
+    return render_table2(df)
 end
 
 
@@ -118,24 +128,24 @@ msg0 = @htl("""
             <p><h1>$subject</h1></p>
 
             <p><h2>Expense Detail(終端支出/收入):</h2></p>
-            <p>$(render_table2(select(expense_thisweek, Not(:email))))</p>
+            <p>$(render_section(select(expense_thisweek, Not(:email))))</p>
 
             <p><h2>Transfer Detail:</h2></p>
-            <p>$(render_table2(df2_thisweek_display))</p>
+            <p>$(render_section(df2_thisweek_display))</p>
 
             <p><h2>Net Expense of This $(arg4.interval):</h2></p>
-            <p>$(render_table2(net_expense_thisweek))</p>
+            <p>$(render_section(net_expense_thisweek))</p>
 
             <p><h2>Net Transfer of Everything:</h2></p>
-            <p>$(render_table2(net_transfer_by_item_thisweek))</p>
+            <p>$(render_section(net_transfer_by_item_thisweek))</p>
 
             <p><h2>Net Flow of This $(arg4.interval):</h2></p>
             <p><small>(Flow = Expense + Transfer)</small></p>
-            <p>$(render_table2(net_overall_thisweek))</p>
+            <p>$(render_section(net_overall_thisweek))</p>
 
             <p><h2>Net Flow of All Time:</h2></p>
 
-            <p>$(render_table2(net_overall))</p>
+            <p>$(render_section(net_overall))</p>
 
         </p>
 
@@ -143,16 +153,21 @@ msg0 = @htl("""
 </html>
 """)
 
-for r in recipients
-    # r = recipients[1]
-    rcpt = to = ["<$r>"]
-    io = IOBuffer()
-    print(io, msg0)
+if isempty(recipients)
+    println("\n⚠️  No recipients found. Skipping email dispatch.")
+else
+    for r in recipients
+        # r = recipients[1]
+        rcpt = to = ["<$r>"]
+        io = IOBuffer()
+        print(io, msg0)
 
-    message = get_mime_msg(HTML(String(take!(io)))) # do this if message is HTML
-    body = get_body(to, from, subject, message) # cc, replyto)
-    # Preview the body: String(take!(body)
+        message = get_mime_msg(HTML(String(take!(io)))) # do this if message is HTML
+        body = get_body(to, from, subject, message) # cc, replyto)
+        # Preview the body: String(take!(body)
 
-    # rcpt = vcat(to, cc, bcc)
-    resp = send(url, rcpt, from, body, opt)
+        # rcpt = vcat(to, cc, bcc)
+        resp = send(url, rcpt, from, body, opt)
+    end
+    println("\n✅ Email sent to $(length(recipients)) recipient(s).")
 end

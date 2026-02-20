@@ -25,6 +25,9 @@ df0a = readgsheet(url2)
 df = preparesheet(df0)
 df2 = preparesheet2(df0a)
 
+nrow(df) == 0 && println("\n⚠️  Expense book (df) is empty after preparesheet.")
+nrow(df2) == 0 && println("\n⚠️  Transfer book (df2) is empty after preparesheet2.")
+
 for dfi in [df, df2]
     transform!(dfi,
         :unit => ByRow(x -> ifelse(ismissing(x), default_unit, x)),
@@ -44,6 +47,7 @@ net_cashflow = subset_transfer_cash(net_transfer_by_item)
 net_transfer_by_item_thisweek = summary_transfer_all(df2 |> timespanfilter(now()))
 net_cashflow_thisweek = subset_transfer_cash(net_transfer_by_item_thisweek)
 dfthisweek = df |> timespanfilter(now())
+nrow(dfthisweek) == 0 && println("\n⚠️  No expense data for this week.")
 net_expense_thisweek = summary_expense(dfthisweek)
 net_expense = summary_expense(df)
 
