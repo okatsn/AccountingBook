@@ -13,13 +13,7 @@ const default_unit = "NTD"
 const default_memo = ""
 
 
-timespanfilter(df) = filter(:time => (dt -> t1_week > dt ≥ t0_week), df)
 
-t1_week = floor(now(), Week) + Day(5) + Hour(8) # we are at UTC+8
-t0_week = t1_week - Week(1)
-
-t0_year = floor(now(), Year) + Hour(8) # we are at UTC+8
-t1_year = t0_year + Year(1)
 
 
 url = "https://docs.google.com/spreadsheets/d/$sheetid/edit?usp=sharing"
@@ -47,9 +41,9 @@ CSV.write(dir_data("transfer", "book.csv"), df2)
 
 net_transfer_by_item = summary_transfer_all(df2)
 net_cashflow = subset_transfer_cash(net_transfer_by_item)
-net_transfer_by_item_thisweek = summary_transfer_all(df2 |> timespanfilter)
+net_transfer_by_item_thisweek = summary_transfer_all(df2 |> timespanfilter(now()))
 net_cashflow_thisweek = subset_transfer_cash(net_transfer_by_item_thisweek)
-dfthisweek = df |> timespanfilter
+dfthisweek = df |> timespanfilter(now())
 net_expense_thisweek = summary_expense(dfthisweek)
 net_expense = summary_expense(df)
 

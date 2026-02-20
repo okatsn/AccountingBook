@@ -25,6 +25,9 @@ using Dates
 include("others.jl")
 export numinout, getmatch, getaccountname
 export Arg4
+include("timefilter.jl")
+export timespanfilter
+
 
 include("processtable.jl")
 export book_svalue, summary_expense, summary_transfer_all, subset_transfer_cash
