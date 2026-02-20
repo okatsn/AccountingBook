@@ -26,9 +26,9 @@ net_overall_thisweek = CSV.read(dir_data("combined", "cashflow_all_thisweek.csv"
 net_transfer_by_item_thisweek = CSV.read(dir_data("transfer", "summary_by_item_thisweek.csv"), DataFrame)
 
 
-dfthis = CSV.read(dir_data("expense", "book_thisweek.csv"), DataFrame)
+expense_thisweek = CSV.read(dir_data("expense", "book_thisweek.csv"), DataFrame)
 
-transform!(dfthis,
+transform!(expense_thisweek,
     :memo => ByRow(x -> ifelse(ismissing(x), "", x)),
     ; renamecols=false)
 
@@ -103,7 +103,7 @@ msg0 = @htl("""
             <p><h1>$subject</h1></p>
 
             <p><h2>支出/收入:</h2></p>
-            <p>$(render_table2(select(dfthis, Not(:email))))</p>
+            <p>$(render_table2(select(expense_thisweek, Not(:email))))</p>
 
             <p><h2>Net Transfer of Everything:</h2></p>
             <p>$(render_table2(net_transfer_by_item_thisweek))</p>
