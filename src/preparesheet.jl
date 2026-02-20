@@ -11,8 +11,8 @@ _empty_transfer() = DataFrame(
 )
 
 function preparesheet(df0)
-    if ncol(df0) == 0
-        @warn "preparesheet: input DataFrame has no columns, returning empty expense table"
+    if ncol(df0) == 0 || nrow(df0) == 0
+        @warn "preparesheet: input DataFrame is empty, returning empty expense table"
         return _empty_expense()
     end
     @chain df0 begin
@@ -36,8 +36,8 @@ end
 emptyprefix!(expr) = df -> emptyprefix!(df, expr)
 
 function preparesheet2(df0a)
-    if ncol(df0a) == 0
-        @warn "preparesheet2: input DataFrame has no columns, returning empty transfer table"
+    if ncol(df0a) == 0 || nrow(df0a) == 0
+        @warn "preparesheet2: input DataFrame is empty, returning empty transfer table"
         return _empty_transfer()
     end
     @chain df0a begin
