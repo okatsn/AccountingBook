@@ -21,10 +21,10 @@ Process the table of transfer by item and unit (and of course by account)
 """
 summary_transfer_all(df2) = @chain df2 begin
     calc_svalue
-    groupby([:whosaccount, :item, :assettype, :unit]) # For one's summary (net flow) by item by unit.
+    groupby([:whosaccount, :item, :pooltype, :unit]) # For one's summary (net flow) by item by unit.
     combine(:svalue => sum => :svalue)
     # describe
-    sort([:whosaccount, :assettype, :item, :unit])
+    sort([:whosaccount, :pooltype, :item, :unit])
 end
 
 
@@ -32,7 +32,7 @@ end
 With the output of `summary_transfer_all`, get the summary for only cashflow.
 """
 subset_transfer_cash(net_transfer_by_item) = @chain net_transfer_by_item begin
-    subset(:assettype => ByRow(x -> x == "現金"))
+    subset(:pooltype => ByRow(x -> x == "現金"))
     groupby([:whosaccount, :unit])
     combine(:svalue => sum => :netflow)
 end

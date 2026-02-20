@@ -33,7 +33,7 @@ function preparesheet2(df0a)
         dftmp = select(df0a, :timestr, :email, Cols(expr)) |> emptyprefix!(expr)
         rename!(dftmp,
             "誰" => :whosaccount,
-            "資產類別" => :assettype,
+            "類別" => :pooltype,
             "項目" => :item,
             "值" => :amount,
             "單位" => :unit,
