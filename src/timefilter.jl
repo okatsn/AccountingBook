@@ -1,4 +1,4 @@
-function timespanfilter(df, timepoint::DateTime; withshift=Day(5) + Hour(8), interval=Week(1))
+function timespanfilter(df, timepoint::DateTime; withshift=Day(1) + Hour(8), interval=Week(1))
     t1_week = floor(timepoint, Week) + withshift # we are at UTC+8
     t0_week = t1_week - interval
 
