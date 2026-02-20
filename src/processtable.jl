@@ -1,3 +1,5 @@
+isbufferpool(x) = x == "緩存區"
+
 """
 Process table's input/output category and absolute values to signed values
 """
@@ -32,7 +34,7 @@ end
 With the output of `summary_transfer_all`, get the summary for only cashflow.
 """
 subset_transfer_cash(net_transfer_by_item) = @chain net_transfer_by_item begin
-    subset(:pooltype => ByRow(x -> x == "緩存區"))
+    subset(:pooltype => ByRow(isbufferpool))
     groupby([:whosaccount, :unit])
     combine(:svalue => sum => :netflow)
 end
