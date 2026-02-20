@@ -15,15 +15,15 @@ stages:
       nfiles: 2
     - path: scripts/weekly_summary.jl
       hash: md5
-      md5: bd74e8724e7cac02a804ba7a59653247
-      size: 3676
+      md5: 1c649979e52dcecc1604ab820016b784
+      size: 5068
   load_data:
     cmd: julia --project=@. scripts/load_data.jl
     deps:
     - path: scripts/load_data.jl
       hash: md5
-      md5: e48c6595a3e175e4888218b9a9a07f33
-      size: 2210
+      md5: 144e8be4b7dab6e163a8b7be4d1baeb6
+      size: 2462
     outs:
     - path: data/combined
       hash: md5
